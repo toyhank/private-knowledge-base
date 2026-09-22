@@ -23,7 +23,7 @@ explicit = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests"]
+testpaths = ["tests", "benchmark"]
 
 [tool.ruff]
 line-length = 110
