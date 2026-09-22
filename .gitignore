@@ -11,3 +11,6 @@ frontend/dist/
 *.log
 test-results/
 
+artifacts/
+outputs/
+feishu-auth-qr.png
