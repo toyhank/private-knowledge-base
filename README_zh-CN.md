@@ -3,7 +3,7 @@
 [English](README.md) · [简体中文](README_zh-CN.md)
 
 <p align="center">
-  <img src="docs/assets/desktop.png" alt="知屿桌面界面" width="900">
+  <img src="docs/assets/demo.gif" alt="知屿界面演示" width="900">
 </p>
 
 一个可以上传 PDF / Word / Markdown / TXT 并基于来源问答的本地 RAG 应用。React 页面、FastAPI API、SQLite 文档元数据、Qdrant 向量索引、BGE-M3、BGE reranker 和本地 OpenAI-compatible LLM 各自独立。
@@ -18,6 +18,31 @@
 - **第一版范围**：单机、单进程、单用户；扫描件不做 OCR；不做多轮上下文、权限系统、混合检索或复杂 Agent。
 
 官方参考：[BGE-M3](https://huggingface.co/BAAI/bge-m3)、[BGE reranker](https://huggingface.co/BAAI/bge-reranker-v2-m3)、[Qdrant 本地模式](https://github.com/qdrant/qdrant-client)、[Ollama 兼容接口](https://docs.ollama.com/api/openai-compatibility)。
+
+## 一键安装
+
+首次安装需要 Python 3.12、Node.js 22+、uv 和 Ollama。
+
+Windows：
+
+```powershell
+git clone https://github.com/toyhank/private-knowledge-base.git
+cd private-knowledge-base
+.\scripts\setup.ps1
+.\scripts\start.ps1
+```
+
+Linux / macOS：
+
+```bash
+git clone https://github.com/toyhank/private-knowledge-base.git
+cd private-knowledge-base
+chmod +x scripts/setup.sh scripts/start.sh
+./scripts/setup.sh
+./scripts/start.sh
+```
+
+安装脚本会自动创建 Python 环境、复制默认配置、下载 BGE 模型、安装并构建前端，以及准备默认 Qwen Ollama 模型。已经有模型时可以用 `-SkipModels` / `-SkipLlm`（Windows）或 `--skip-models` / `--skip-llm`（Linux/macOS）跳过对应步骤。
 
 ## 本机启动（Windows）
 
@@ -161,6 +186,30 @@ PDF 保留物理页码，DOCX 不编造页码；Word 表格按行解析。切分
 - 文件、索引和 SQLite 在 `data/`，模型在 `models/`；备份前停止服务。上传限制默认 25MB，解析限制 200 万字符 / 500 页 PDF。
 - 这是本机个人应用，没有登录和部门权限。默认监听 127.0.0.1；不要将此 MVP 直接作为多人公网服务。
 
+## 可复现 Benchmark
+
+服务启动后执行：
+
+```powershell
+.\.venv\Scripts\python.exe scripts\benchmark.py
+```
+
+内置评测集包含 10 个确定性问题，覆盖正确回答、真实引用和应该拒答的知识库外问题。评测会检查：
+
+- 回答是否包含预期事实；
+- 正向问题是否返回包含支持证据的真实 chunk；
+- 知识库没有答案时是否正确拒答且不返回引用；
+- 每个问题的 API 延迟。
+
+结果会写入：
+
+```text
+benchmark/results/latest.json
+benchmark/results/latest.md
+```
+
+这里刻意不伪造 Recall@K：默认公开 API 没有暴露完整检索 trace，所以 README 展示的是任何人都能复跑的**端到端 grounded-answer 指标**。评测数据位于 `benchmark/company_policy.jsonl`，可以自行扩展。
+
 ## 测试
 
 ```powershell
@@ -177,6 +226,8 @@ npm.cmd run build --prefix frontend
 
 ## 下一步最值得改进
 
-1. 用实际文档建立评测集，测召回率、引用支持率、拒答误判率；据此调整阈值、chunk 和模型，避免凭感觉换大模型。
+现在仓库已经包含版本化端到端 Benchmark 和一键安装脚本。下一步最值得做的是：
+
+1. 把内置 10 题评测集扩展到真实业务文档，进一步测检索命中率、引用支持率和拒答误判率。
 2. 加 BM25 / sparse 的混合召回，提高条款编号、缩写和专有词的命中率。
 3. 针对真实 PDF 的多栏、表格和扫描件优化解析；多人使用前再加入身份认证、文档权限与独立任务队列。

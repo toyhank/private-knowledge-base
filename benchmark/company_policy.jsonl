@@ -1,0 +1,10 @@
+{"id":"beijing_hotel","question":"北京出差的住宿标准是多少？","expect_refusal":false,"must_contain":["600"],"support_terms":["北京","600"]}
+{"id":"shanghai_hotel","question":"上海出差的住宿标准是多少？","expect_refusal":false,"must_contain":["550"],"support_terms":["上海","550"]}
+{"id":"hotel_over_limit","question":"住宿超过标准时需要什么条件？","expect_refusal":false,"must_contain":["书面批准"],"support_terms":["超过标准","书面批准"]}
+{"id":"meal_allowance","question":"国内出差餐饮补贴是多少？","expect_refusal":false,"must_contain":["100"],"support_terms":["餐饮补贴","100"]}
+{"id":"provided_meal","question":"公司统一提供餐食时还能重复领取当餐补贴吗？","expect_refusal":false,"must_contain":["不再"],"support_terms":["统一提供餐食","不再重复"]}
+{"id":"reimbursement_deadline","question":"出差结束后多久内要提交报销材料？","expect_refusal":false,"must_contain":["10","工作日"],"support_terms":["10 个工作日"]}
+{"id":"reimbursement_materials","question":"报销需要提供哪些材料？","expect_refusal":false,"must_contain":["发票","行程单","审批记录"],"support_terms":["发票","行程单","审批记录"]}
+{"id":"mars_base","question":"公司的火星基地地址是什么？","expect_refusal":true}
+{"id":"sick_leave","question":"公司的病假每年有多少天？","expect_refusal":true}
+{"id":"singapore_hotel","question":"新加坡出差住宿标准是多少？","expect_refusal":true}

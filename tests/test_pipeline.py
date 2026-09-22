@@ -100,7 +100,7 @@ def test_debug_is_explicit_opt_in(settings, pipeline):
 
 
 def test_multiple_chinese_chunks_fit_token_budget(settings, pipeline):
-    repository, _, retrieval, chunks = pipeline
+    repository, _, retrieval, _chunks = pipeline
     settings.rag_debug = True
 
     class HighScoreReranker:

@@ -4,6 +4,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-local_API-009688)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-local_UI-61DAFB)](https://react.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![lightweight checks](https://github.com/toyhank/private-knowledge-base/actions/workflows/static.yml/badge.svg)](https://github.com/toyhank/private-knowledge-base/actions/workflows/static.yml)
 ![Local First](https://img.shields.io/badge/data-local--first-success)
 ![8GB VRAM](https://img.shields.io/badge/GPU-8GB_VRAM_ready-orange)
 
@@ -16,7 +17,7 @@ No LangChain. No mandatory cloud API. No mystery citation IDs.
 > Built for people who want to inspect the whole RAG pipeline and run it on consumer hardware — including an 8GB GPU setup.
 
 <p align="center">
-  <img src="docs/assets/desktop.png" alt="KnowIsland desktop UI" width="900">
+  <img src="docs/assets/demo.gif" alt="KnowIsland UI demo" width="900">
 </p>
 
 ## Why this repo?
@@ -52,8 +53,6 @@ Question → BGE-M3 → Top 30 → BGE reranker
 
 ## Quick start
 
-### Windows
-
 Requirements:
 
 - Python 3.12
@@ -61,32 +60,33 @@ Requirements:
 - [uv](https://docs.astral.sh/uv/)
 - [Ollama](https://ollama.com/)
 
+### Windows
+
 ```powershell
 git clone https://github.com/toyhank/private-knowledge-base.git
 cd private-knowledge-base
-
-uv sync --python 3.12 --cache-dir .cache/uv
-Copy-Item .env.example .env
-.\.venv\Scripts\python.exe scripts\download_models.py
-
-npm.cmd ci --prefix frontend
-npm.cmd run build --prefix frontend
-
-ollama pull qwen3:8b
-ollama create knowledge-qwen3:8b -f scripts/Modelfile
-
+.\scripts\setup.ps1
 .\scripts\start.ps1
 ```
 
-Open **http://127.0.0.1:8000**.
-
 ### Linux / macOS
 
-The setup is the same; use `.venv/bin/python` and:
-
 ```bash
-sh scripts/start.sh
+git clone https://github.com/toyhank/private-knowledge-base.git
+cd private-knowledge-base
+chmod +x scripts/setup.sh scripts/start.sh
+./scripts/setup.sh
+./scripts/start.sh
 ```
+
+The setup script creates the Python environment, copies `.env.example` when needed,
+downloads the local BGE models, installs/builds the frontend, and prepares the default
+Qwen model in Ollama.
+
+Use `--skip-models` / `--skip-llm` on Linux or `-SkipModels` / `-SkipLlm`
+on Windows when those pieces are already installed.
+
+Open **http://127.0.0.1:8000**.
 
 ## Try the built-in example
 
@@ -185,6 +185,27 @@ Mobile:
 | `POST /api/chat` | Ask a grounded question |
 | `GET /api/health` | Check LLM and model status |
 
+## Reproducible benchmark
+
+With KnowIsland running locally:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\benchmark.py
+```
+
+The benchmark uploads the synthetic sample policy, runs 10 deterministic questions,
+checks answer facts, verifies that positive answers include supporting source text,
+checks refusal behavior for unsupported questions, records API latency, and writes:
+
+```text
+benchmark/results/latest.json
+benchmark/results/latest.md
+```
+
+This deliberately reports **end-to-end grounded-answer behavior**, not an invented
+Recall@K number. The benchmark dataset is versioned in
+`benchmark/company_policy.jsonl`, so anyone can reproduce or extend it.
+
 ## Run the tests
 
 ```powershell
@@ -218,13 +239,14 @@ That boundary is intentional: the current codebase stays small enough to read an
 
 The highest-value next steps are:
 
+- [x] versioned end-to-end evaluation dataset + reproducible grounded-answer metrics
+- [x] one-command Windows / Linux setup scripts
 - [ ] BM25 / sparse + dense hybrid retrieval with RRF
-- [ ] built-in retrieval evaluation dataset and metrics
 - [ ] OCR for scanned PDFs and images
 - [ ] better table / multi-column PDF parsing
 - [ ] persistent multi-turn conversations
 - [ ] multi-user permissions
-- [ ] packaging for a simpler one-command desktop install
+- [ ] standalone desktop packaging
 
 ## Project structure
 

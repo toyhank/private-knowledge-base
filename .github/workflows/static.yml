@@ -1,0 +1,42 @@
+name: lightweight checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Python syntax
+        run: python -m py_compile scripts/benchmark.py
+      - name: Test benchmark evaluator
+        run: |
+          python -m pip install --disable-pip-version-check "httpx>=0.28,<1" "pytest>=8,<10"
+          python -m pytest tests/test_benchmark.py -q
+      - name: Check shell setup script
+        run: bash -n scripts/setup.sh
+      - name: Validate benchmark dataset
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows = [
+              json.loads(line)
+              for line in Path("benchmark/company_policy.jsonl").read_text(encoding="utf-8").splitlines()
+              if line.strip() and not line.lstrip().startswith("#")
+          ]
+          assert len(rows) == 10
+          assert any(row["expect_refusal"] for row in rows)
+          assert any(not row["expect_refusal"] for row in rows)
+          print(f"validated {len(rows)} benchmark cases")
+          PY
+      - name: Check README assets
+        run: |
+          test -s docs/assets/demo.gif
+          test -s docs/assets/desktop.png
+          test -s docs/assets/mobile.png

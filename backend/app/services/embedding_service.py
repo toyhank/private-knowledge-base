@@ -24,8 +24,8 @@ class EmbeddingService:
                                 cache_dir=str(self.settings.model_cache),
                                 local_files_only=True,
                             )
-                        except Exception:
-                            pass
+                        except Exception:  # noqa: BLE001 - fall back to the configured local model path
+                            model_path = self.settings.embedding_model
                     model = SentenceTransformer(
                         model_path,
                         device=self.settings.embedding_device,
